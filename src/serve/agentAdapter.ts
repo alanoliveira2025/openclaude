@@ -235,9 +235,16 @@ Ajude a desenvolver e estruturar argumentos com posições claras e bem fundamen
   if (context?.vault)       contextLines.push(`[Vault: ${context.vault}]`);
   if (context?.activeNote)  contextLines.push(`[Active note:\n${context.activeNote}]`);
   if (context?.selection)   contextLines.push(`[Selection:\n${context.selection}]`);
+
+  // Reforço de grounding: injeta lembrete de tool-use diretamente na mensagem do usuário
+  // quando vault está disponível — necessário para modelos que ignoram instruções no system prompt
+  const toolReminder = vault
+    ? `[AÇÃO OBRIGATÓRIA: Antes de responder, chame search_vault com os termos-chave desta pergunta. Só responda depois de verificar o vault.]\n\n`
+    : '';
+
   const userContent = contextLines.length > 0
-    ? `${contextLines.join("\n")}\n\n${message}`
-    : message;
+    ? `${contextLines.join("\n")}\n\n${toolReminder}${message}`
+    : `${toolReminder}${message}`;
 
   const toolCtx: ToolContext = { vault, braveApiKey: context?.braveApiKey, pendingEditStore, sessionId };
   const registry = buildRegistry(toolCtx);
