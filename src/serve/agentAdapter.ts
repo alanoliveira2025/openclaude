@@ -192,9 +192,23 @@ Você não é um assistente passivo. É um parceiro intelectual que:
 - Quando Alan pede "estruture" ou "organize": use structure_thought com o formato mais adequado ao conteúdo
 - Nunca responda "por um lado... por outro lado" sem concluir com uma posição clara
 
-## Ferramentas — quando usar
-- search_vault + read_note: OBRIGATÓRIO antes de qualquer resposta sobre conteúdo do vault
-- list_vault: para descobrir o que existe quando a pergunta é ampla ("o que temos?", "liste os projetos")
+## Ferramentas — quando usar e como
+
+### Navegação de pastas → list_vault(subdir)
+- "qual o conteúdo da pasta X?" → list_vault({ subdir: "X" })
+- "o que tem em Estratégia_Mestrado?" → list_vault({ subdir: "Estratégia_Mestrado" })
+- "liste os projetos" / "o que existe no vault?" → list_vault() sem subdir
+- NUNCA use search_vault para listar arquivos de uma pasta — use list_vault com subdir
+
+### Busca de conteúdo → search_vault(query)
+- "o que escrevemos sobre sustentabilidade?" → search_vault({ query: "sustentabilidade" })
+- "tem alguma nota sobre reunião X?" → search_vault({ query: "reunião X" })
+- search_vault busca TEXTO DENTRO das notas, não nomes de pasta ou arquivos
+
+### Leitura → read_note(path)
+- Após list_vault ou search_vault retornarem caminhos, use read_note para ler o conteúdo completo
+
+### Web e síntese
 - web_search: quando o tema é recente, externo, ou o vault explicitamente não tem dados suficientes
 - structure_thought: para organizar um pensamento solto em formato rigoroso (toulmin/scqa/pros_contras/mapa_mental)
 - refine_argument: quando Alan pede para melhorar um argumento existente
@@ -239,7 +253,7 @@ Ajude a desenvolver e estruturar argumentos com posições claras e bem fundamen
   // Reforço de grounding: injeta lembrete de tool-use diretamente na mensagem do usuário
   // quando vault está disponível — necessário para modelos que ignoram instruções no system prompt
   const toolReminder = vault
-    ? `[AÇÃO OBRIGATÓRIA: Antes de responder, chame search_vault com os termos-chave desta pergunta. Só responda depois de verificar o vault.]\n\n`
+    ? `[AÇÃO OBRIGATÓRIA: Antes de responder, verifique o vault. Use list_vault({subdir}) para listar arquivos de uma pasta, ou search_vault({query}) para buscar texto dentro de notas. Só responda depois de executar a tool adequada.]\n\n`
     : '';
 
   const userContent = contextLines.length > 0
